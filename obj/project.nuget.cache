@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "BoZsrOeB9JGoxSyjmIprosQjnoJuyP3NRbgM8hJLX2MEf2PAhmKtV6nOAal0pd0pyl7SrsicVVU70McxQNANJQ==",
+  "dgSpecHash": "ls9dWNXIBxb4hHXXzsMwFM2vHtZ4DbKTv5oK6N6iTM9JEEy5EiclQ/oMx3rQFuatxrLMJErIT/MXBXnNMYzxug==",
   "success": true,
-  "projectFilePath": "C:\\Users\\nhokb\\source\\repos\\WebAPI\\WebAPI.csproj",
+  "projectFilePath": "C:\\Users\\nhokb\\source\\repos\\webapi.net\\WebAPI\\WebAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nhokb\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\nhokb\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",

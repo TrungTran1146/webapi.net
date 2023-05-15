@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nhokb\\source\\repos\\WebAPI\\WebAPI.csproj": {}
+    "C:\\Users\\nhokb\\source\\repos\\webapi.net\\WebAPI\\WebAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nhokb\\source\\repos\\WebAPI\\WebAPI.csproj": {
+    "C:\\Users\\nhokb\\source\\repos\\webapi.net\\WebAPI\\WebAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nhokb\\source\\repos\\WebAPI\\WebAPI.csproj",
+        "projectUniqueName": "C:\\Users\\nhokb\\source\\repos\\webapi.net\\WebAPI\\WebAPI.csproj",
         "projectName": "WebAPI",
-        "projectPath": "C:\\Users\\nhokb\\source\\repos\\WebAPI\\WebAPI.csproj",
+        "projectPath": "C:\\Users\\nhokb\\source\\repos\\webapi.net\\WebAPI\\WebAPI.csproj",
         "packagesPath": "C:\\Users\\nhokb\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nhokb\\source\\repos\\WebAPI\\obj\\",
+        "outputPath": "C:\\Users\\nhokb\\source\\repos\\webapi.net\\WebAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\nhokb\\AppData\\Roaming\\NuGet\\NuGet.Config",
