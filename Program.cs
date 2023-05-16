@@ -6,10 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using WebAPI.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
-ConfigurationManager configuration = builder.Configuration;
+Microsoft.Extensions.Configuration.ConfigurationManager configuration = builder.Configuration;
 
 //1.tao postgres
 builder.Services.AddDbContext<DataContext>(o =>
@@ -17,7 +18,7 @@ o.UseNpgsql(builder.Configuration.GetConnectionString("Postgres_Db")));
 // Add services to the container.
 
 
-
+builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 
 
 /////////////////////////////////////////////////////////////////////////////

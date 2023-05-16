@@ -9,5 +9,6 @@
         bool SetData<T>(string key, T value, DateTimeOffset expirationTime);
 
         object RemoveData(string key);
+        
     }
 }

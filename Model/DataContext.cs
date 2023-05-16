@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
+using System.Reflection.Emit;
 
 
 namespace WebAPI.Model
@@ -10,9 +11,19 @@ namespace WebAPI.Model
        // IdentityDbContext<IdentityUser>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
+            modelBuilder.Entity<Product>(entity =>
+            {
+
+
+                entity.Property(e => e.Id)
+
+                    .HasColumnType("serial")
+                    .IsRequired();
+
+            });
+
         }
 
         public DbSet<Brand> Brands { get; set; }
