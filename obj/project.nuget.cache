@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "ls9dWNXIBxb4hHXXzsMwFM2vHtZ4DbKTv5oK6N6iTM9JEEy5EiclQ/oMx3rQFuatxrLMJErIT/MXBXnNMYzxug==",
+  "dgSpecHash": "F4kNUoHIQ6u4f7fQ9HjUR9F8LWdufkgBInPCnIphQ0cQiOpaUve9w93ds1CwVSevkVSOfUimn+g9vF6do864aA==",
   "success": true,
   "projectFilePath": "C:\\Users\\nhokb\\source\\repos\\webapi.net\\WebAPI\\WebAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nhokb\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
+    "C:\\Users\\nhokb\\.nuget\\packages\\confluent.kafka\\2.1.1\\confluent.kafka.2.1.1.nupkg.sha512",
     "C:\\Users\\nhokb\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
+    "C:\\Users\\nhokb\\.nuget\\packages\\librdkafka.redist\\2.1.1\\librdkafka.redist.2.1.1.nupkg.sha512",
     "C:\\Users\\nhokb\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\6.0.0\\microsoft.aspnetcore.authentication.jwtbearer.6.0.0.nupkg.sha512",
     "C:\\Users\\nhokb\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\6.0.0\\microsoft.aspnetcore.cryptography.internal.6.0.0.nupkg.sha512",
     "C:\\Users\\nhokb\\.nuget\\packages\\microsoft.aspnetcore.cryptography.keyderivation\\6.0.0\\microsoft.aspnetcore.cryptography.keyderivation.6.0.0.nupkg.sha512",
@@ -54,6 +56,7 @@
     "C:\\Users\\nhokb\\.nuget\\packages\\system.drawing.common\\5.0.0\\system.drawing.common.5.0.0.nupkg.sha512",
     "C:\\Users\\nhokb\\.nuget\\packages\\system.identitymodel.tokens.jwt\\6.10.0\\system.identitymodel.tokens.jwt.6.10.0.nupkg.sha512",
     "C:\\Users\\nhokb\\.nuget\\packages\\system.io.pipelines\\5.0.1\\system.io.pipelines.5.0.1.nupkg.sha512",
+    "C:\\Users\\nhokb\\.nuget\\packages\\system.memory\\4.5.0\\system.memory.4.5.0.nupkg.sha512",
     "C:\\Users\\nhokb\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\nhokb\\.nuget\\packages\\system.security.accesscontrol\\5.0.0\\system.security.accesscontrol.5.0.0.nupkg.sha512",
     "C:\\Users\\nhokb\\.nuget\\packages\\system.security.cryptography.cng\\4.5.0\\system.security.cryptography.cng.4.5.0.nupkg.sha512",

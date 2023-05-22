@@ -61,6 +61,7 @@ namespace APIDemo.Controllers
             {
                 return Ok(new Response
                 {
+
                     Success = false,
                     Message = "Invalid username/password"
                 });
@@ -100,49 +101,7 @@ namespace APIDemo.Controllers
             });
 
         }
-//        //[Authorize(Policy = "admin")]
-//        //[Authorize]
-//        //[HttpPost("logout")]
-//        //public async Task<IActionResult> Logout()
-//        //{
-//        //    var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-//        //    if (token != null)
-//        //    {
-//        //        // invalidate token
-//        //        await _tokenService.InvalidateTokenAsync(token);
 
-//        //        return Ok(new { message = "Logout successful" });
-//        //    }
-
-//        //    return BadRequest(new { message = "Invalid request" });
-//        //}
-//        //private string GenerateJwtToken(User user)
-//        //{
-//        //    var tokenHandler = new JwtSecurityTokenHandler();
-//        //    var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]);
-//        //    var tokenDescriptor = new SecurityTokenDescriptor
-//        //    {
-//        //        Subject = new ClaimsIdentity(new Claim[]
-//        //        {
-//        //    new Claim("ProductId", user.ProductId.ToString()),
-//        //    new Claim(ClaimTypes.Name, user.UserName),
-//        //    new Claim(ClaimTypes.Email,user.Email),
-//        //    new Claim("FullName", user.FullName),
-
-
-//        //    //roles
-//        //    new Claim("TokenId", Guid.NewGuid().ToString())
-//        //            // new Claim(ClaimTypes.Role, user.Role)
-//        //        }),
-//        //        Expires = DateTime.UtcNow.AddDays(1),
-//        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-//        //    };
-
-//        //    var token = tokenHandler.CreateToken(tokenDescriptor);
-//        //    var tokenString = tokenHandler.WriteToken(token);
-
-//        //    return tokenString;
-//        //}
 
    }
 }
