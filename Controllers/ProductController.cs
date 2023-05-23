@@ -7,6 +7,7 @@ using WebAPI.Migrations;
 using WebAPI.Redis;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 
 namespace APIDemo.Controllers
 {
@@ -64,17 +65,51 @@ namespace APIDemo.Controllers
             return default;
         }
         //Thêm
-        [Authorize(Policy = "admin")]
-        [HttpPost("CreateProduct")]
-        public async Task<IActionResult> Post(Product value)
-        {
-            var obj = await _dbContext.Products.AddAsync(value);
+        //[Authorize(Policy = "admin")]
+        //[HttpPost("CreateProduct")]
+        //public async Task<IActionResult> Post(Product value)
+        //{
+        //    var obj = await _dbContext.Products.AddAsync(value);
 
+        // //   var expirationTime = DateTimeOffset.Now.AddMinutes(5);
+        //  //  _cacheService.SetData<Product>("product",obj.Entity,expirationTime);
+        //    _cacheService.RemoveData("product");
+        //    await _dbContext.SaveChangesAsync();
+        //    return Ok(obj.Entity);
+        //}
+        //[Authorize(Policy = "admin")]
+        [HttpPost("CreateProduct")]
+        public async Task<IActionResult> Post([FromForm] string datajson,IFormFile fileimage)
+        {
+            
+            var product =JsonConvert.DeserializeObject<Product>(datajson);
+            var findP = _dbContext.Products.Find(product.Id);
+            if (findP != null) {
+                return Ok("Mã sản phẩm này đã tồn tại");
+            }
+            else
+            {
+                if (fileimage.Length >0) {
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileimage.FileName);
+                    using (var stream = System.IO.File.Create(path))
+                    {
+                        await fileimage.CopyToAsync(stream);
+                    }
+                    product.Image = "/images/" + fileimage.FileName;
+                }
+                else
+                {
+                    product.Image = "";
+                }
+                _dbContext.Products.Add(product);
+                _cacheService.RemoveData("product");
+                await _dbContext.SaveChangesAsync();
+                return Ok(product);
+            }
          //   var expirationTime = DateTimeOffset.Now.AddMinutes(5);
           //  _cacheService.SetData<Product>("product",obj.Entity,expirationTime);
-            _cacheService.RemoveData("product");
-            await _dbContext.SaveChangesAsync();
-            return Ok(obj.Entity);
+           
+          
         }
 
         //Sửa theo Id ?

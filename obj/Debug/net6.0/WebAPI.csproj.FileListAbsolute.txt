@@ -88,3 +88,4 @@ C:\Users\nhokb\source\repos\webapi.net\WebAPI\bin\Debug\net6.0\runtimes\win-x86\
 C:\Users\nhokb\source\repos\webapi.net\WebAPI\bin\Debug\net6.0\runtimes\win-x86\native\vcruntime140.dll
 C:\Users\nhokb\source\repos\webapi.net\WebAPI\bin\Debug\net6.0\runtimes\win-x86\native\zlib1.dll
 C:\Users\nhokb\source\repos\webapi.net\WebAPI\bin\Debug\net6.0\runtimes\win-x86\native\zstd.dll
+C:\Users\nhokb\source\repos\webapi.net\WebAPI\bin\Debug\net6.0\WebAPI.staticwebassets.runtime.json

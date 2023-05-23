@@ -29,6 +29,7 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
     <Folder Include="Kafka\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>
