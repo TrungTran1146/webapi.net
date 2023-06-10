@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebAPI.Model
 {
@@ -23,8 +23,8 @@ namespace WebAPI.Model
         public int BrandId { get; set; }
         //public virtual Brand Brand { get; set; }
 
-         public int TypeCarId { get; set; }
-       // public virtual TypeCar TypeCar { get; set; }
+        public int TypeCarId { get; set; }
+        // public virtual TypeCar TypeCar { get; set; }
 
         public virtual ICollection<ImportProduct> ImportProducts { get; } = new List<ImportProduct>();
 

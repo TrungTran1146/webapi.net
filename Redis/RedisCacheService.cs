@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using StackExchange.Redis;
-using System;
 
 namespace WebAPI.Redis
 {
@@ -49,6 +48,6 @@ namespace WebAPI.Redis
             return false;
         }
 
-       
+
     }
 }

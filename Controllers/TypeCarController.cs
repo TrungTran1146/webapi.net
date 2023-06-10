@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Model;
 using WebAPI.Redis;
@@ -60,7 +58,7 @@ namespace WebAPI.Controllers
             return default;
         }
         //Thêm
-        [Authorize(Policy = "admin")]
+        //[Authorize(Policy = "admin")]
         [HttpPost("CreateTypeCar")]
         public async Task<IActionResult> Post(TypeCar value)
         {
@@ -74,7 +72,7 @@ namespace WebAPI.Controllers
         }
 
         //Sửa theo Id ?
-        [Authorize(Policy = "admin")]
+        //[Authorize(Policy = "admin")]
         [HttpPut("UpdateTypeCar/{id}")]
         public async Task<IActionResult> Update(int id, TypeCar TypeCar)
         {
@@ -98,10 +96,10 @@ namespace WebAPI.Controllers
                 _cacheService.RemoveData("TypeCar");
             }
 
-            return Ok("Update Success");
+            return Ok(sp_update);
         }
         //Xóa
-        [Authorize(Policy = "admin")]
+        //[Authorize(Policy = "admin")]
         [HttpDelete("DeleteTypeCar/{id}")]
         public async Task<IActionResult> Delete(int id)
         {

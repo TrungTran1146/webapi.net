@@ -1,11 +1,11 @@
-﻿using WebAPI.Model;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Minio.AspNetCore;
 using System.Text;
+using WebAPI.Logstash;
+using WebAPI.Model;
 using WebAPI.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,14 +18,34 @@ o.UseNpgsql(builder.Configuration.GetConnectionString("Postgres_Db")));
 // Add services to the container.
 
 
+//MINIO
+builder.Services.AddMinio(options =>
+{
+    builder.Configuration.GetSection("Minio").Bind(options);
+    var port = builder.Configuration.GetValue<int>("Minio:Port");
+    options.ConfigureClient(client =>
+    {
+        client.WithEndpoint(options.Endpoint, port);
+    });
+});
+///*builder.Services.AddSingleton(new MinioClient(
+//       builder.Configuration.GetValue<string>("Minio:Endpoint"),
+//       builder.Configuration.GetValue<string>("Minio:AccessKey"),
+//        builder.Configuration.GetValue<string>("Minio:SecretKey"),
+//         builder.Configuration.GetValue<string>("Minio:BucketName")));*/
+
+
+//redis
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 
+////kafka
+//builder.Services.AddSingleton(new ProducerBuilder<Null, string>(new ProducerConfig { BootstrapServers = "localhost:9092" }));
 
-/////////////////////////////////////////////////////////////////////////////
-// For Identity
-//builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-//    .AddEntityFrameworkStores<DataContext>()
-//    .AddDefaultTokenProviders();
+
+//// Đăng ký ProductConsumer
+//builder.Services.AddSingleton<CartConsumer>();
+
+
 
 // Adding Authentication
 builder.Services.AddAuthentication(options =>
@@ -105,19 +125,16 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 builder.Services.AddSwaggerGen();
-// 6. Add CORS policy
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("MyAllowedOrigins",
-//        policy =>
-//        {
-//            policy.WithOrigins("https://localhost:8081") // note the port is included 
-//                .AllowAnyHeader()
-//                .AllowAnyMethod();
-//        });
-//});
+
+
+//Logstash
+builder.Services.AddElasticsearch(builder.Configuration);
 
 var app = builder.Build();
+
+
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

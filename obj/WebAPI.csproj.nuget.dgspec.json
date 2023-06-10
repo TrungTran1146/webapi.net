@@ -44,9 +44,17 @@
               "target": "Package",
               "version": "[4.0.3, )"
             },
+            "ByteSize": {
+              "target": "Package",
+              "version": "[2.1.1, )"
+            },
             "Confluent.Kafka": {
               "target": "Package",
               "version": "[2.1.1, )"
+            },
+            "Elasticsearch.Net": {
+              "target": "Package",
+              "version": "[7.17.5, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
@@ -72,6 +80,22 @@
               "target": "Package",
               "version": "[6.0.0, )"
             },
+            "Minio": {
+              "target": "Package",
+              "version": "[4.0.7, )"
+            },
+            "Minio.AspNetCore": {
+              "target": "Package",
+              "version": "[4.0.8, )"
+            },
+            "Minio.Client.Http": {
+              "target": "Package",
+              "version": "[1.0.9, )"
+            },
+            "NEST": {
+              "target": "Package",
+              "version": "[7.17.5, )"
+            },
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )"
@@ -87,6 +111,18 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.2.3, )"
+            },
+            "System.IO": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.Net.Http": {
+              "target": "Package",
+              "version": "[4.3.4, )"
+            },
+            "UploadFileToMinio": {
+              "target": "Package",
+              "version": "[1.0.0, )"
             }
           },
           "imports": [

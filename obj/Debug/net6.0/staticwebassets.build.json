@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "BcMhkQ0fCeSkE9lR679B8hpR/81pF6HXFmsP2AMPtvA=",
+  "Hash": "QjfinlajftrK1d7jrhRXBwXPla4GV+5tEHEyoe5Mkzk=",
   "Source": "WebAPI",
   "BasePath": "_content/WebAPI",
   "Mode": "Default",
@@ -15,5 +15,40 @@
       "Pattern": "**"
     }
   ],
-  "Assets": []
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\nhokb\\source\\repos\\webapi.net\\WebAPI\\wwwroot\\images\\2566x14402.png",
+      "SourceId": "WebAPI",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\nhokb\\source\\repos\\webapi.net\\WebAPI\\wwwroot\\",
+      "BasePath": "_content/WebAPI",
+      "RelativePath": "images/2566x14402.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\2566x14402.png"
+    },
+    {
+      "Identity": "C:\\Users\\nhokb\\source\\repos\\webapi.net\\WebAPI\\wwwroot\\images\\341489541_644017707739654_7431601547467703873_n.jpg",
+      "SourceId": "WebAPI",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\nhokb\\source\\repos\\webapi.net\\WebAPI\\wwwroot\\",
+      "BasePath": "_content/WebAPI",
+      "RelativePath": "images/341489541_644017707739654_7431601547467703873_n.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\341489541_644017707739654_7431601547467703873_n.jpg"
+    }
+  ]
 }

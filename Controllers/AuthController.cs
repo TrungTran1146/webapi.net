@@ -1,15 +1,11 @@
-﻿using WebAPI.Model;
-using WebAPI.Model.Auth;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using WebAPI.Model;
+using WebAPI.Model.Auth;
 
 namespace APIDemo.Controllers
 {
@@ -97,11 +93,17 @@ namespace APIDemo.Controllers
                 Success = true,
                 Message = "Authenticte success",
                 // Data = GenerateJwtToken(user)
-                Data = tokenString
+                Data = new
+                {
+                    id = existingUser.Id,
+                    Name = existingUser.UserName,
+                    token = tokenString
+                }
+
             });
 
         }
 
 
-   }
+    }
 }

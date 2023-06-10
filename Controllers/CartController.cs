@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.Migrations;
 using WebAPI.Model;
 using WebAPI.Redis;
 
@@ -13,10 +11,20 @@ namespace WebAPI.Controllers
     {
         private readonly DataContext _dbContext;
         private readonly IRedisCacheService _cacheService;
-        public CartController(DataContext dbContext, IRedisCacheService cacheService)
+
+        //private readonly KafkaProducer _kafkaProducer;
+        //private readonly KafkaConsumer _kafkaConsumer;
+        public CartController(
+            DataContext dbContext,
+            IRedisCacheService cacheService
+            //KafkaProducer kafkaProducer,
+            //KafkaConsumer kafkaConsumer
+            )
         {
             _dbContext = dbContext;
             _cacheService = cacheService;
+            //_kafkaProducer = kafkaProducer;
+            //_kafkaConsumer = kafkaConsumer;
         }
 
         //Tìm ALL
@@ -47,6 +55,10 @@ namespace WebAPI.Controllers
                 return Ok(filteredData);
 
             }
+            //else
+            //{
+            //    return NotFound("Không tìm thấy sản phẩm trong giỏ");
+            //}
 
             filteredData = await _dbContext.Carts.FirstOrDefaultAsync(x => x.Id == id);
             if (filteredData != null)
@@ -55,15 +67,15 @@ namespace WebAPI.Controllers
             }
             else
             {
-                return NotFound("Không tìm thấy sản phẩm");
+                return NotFound("Không tìm thấy sản phẩm sản phẩm trong giỏ");
             }
             return default;
         }
         //Thêm
         [HttpPost("CreateCart")]
-        public async Task<IActionResult> Post(Cart value)
+        public async Task<IActionResult> Post(Cart cart)
         {
-            var obj = await _dbContext.Carts.AddAsync(value);
+            var obj = await _dbContext.Carts.AddAsync(cart);
 
             //   var expirationTime = DateTimeOffset.Now.AddMinutes(5);
             //  _cacheService.SetData<Cart>("cart",obj.Entity,expirationTime);
@@ -72,6 +84,41 @@ namespace WebAPI.Controllers
             return Ok(obj.Entity);
         }
 
+        //[HttpPost("CreateCart")]
+        //public async Task<IActionResult> Post(Cart cart)
+        //{
+        //    // Serialize cart object thành JSON string
+        //    //var cartJson = JsonSerializer.Serialize(cart);
+
+        //    //try
+        //    //{
+        //    //    // Gửi message đến Kafka để thông báo có sản phẩm mới được thêm vào
+        //    //    var topicName = "cart-added";
+        //    //    var result = await _producer.ProduceAsync(topicName, new Message<Null, string>
+        //    //    {
+        //    //        Value = cartJson
+        //    //    });
+
+        //    //    // Lưu thông tin sản phẩm vào Redis
+        //    //    var expirationTime = DateTimeOffset.Now.AddMinutes(5);
+        //    //    var key = $"cart:{cart.Id}";
+
+        //    //    _cacheService.SetData(key, cartJson, expirationTime);
+
+        //    //    return Ok();
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    return StatusCode(500, ex.Message);
+        //    //}
+        //    // Add new product to Kafka topic
+        //    var message = JsonConvert.SerializeObject(cart);
+        //    await _kafkaProducer.ProduceAsync("products", message);
+
+        //    return Ok();
+        //}
+
+        /////////////////////
         //Sửa theo Id ?
         [HttpPut("UpdateCart/{id}")]
         public async Task<IActionResult> Update(int id, Cart cart)
@@ -83,10 +130,10 @@ namespace WebAPI.Controllers
             {
                 return NotFound("Không tìm thấy sản phẩm");
             }
-         
+
             else
             {
-                
+
                 if (!String.IsNullOrEmpty(cart.Quantity.ToString()))
                     sp_update.Quantity = cart.Quantity;
 
@@ -117,3 +164,5 @@ namespace WebAPI.Controllers
         }
     }
 }
+
+
