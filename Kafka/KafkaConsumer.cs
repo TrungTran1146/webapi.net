@@ -71,7 +71,7 @@ namespace WebAPI.Kafka
                             }
                             else
                             {
-                                existingcart.Status = cart.Status;
+                                //existingcart.Status = cart.Status;
                                 existingcart.Quantity = cart.Quantity;
                                 //existingcart.Price = cart.Price;
 

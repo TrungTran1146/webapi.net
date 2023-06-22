@@ -64,8 +64,6 @@ namespace WebAPI.Controllers
         {
             var obj = await _dbContext.TypeCars.AddAsync(value);
 
-            //   var expirationTime = DateTimeOffset.Now.AddMinutes(5);
-            //  _cacheService.SetData<TypeCar>("TypeCar",obj.Entity,expirationTime);
             _cacheService.RemoveData("TypeCar");
             await _dbContext.SaveChangesAsync();
             return Ok(obj.Entity);

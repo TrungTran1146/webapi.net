@@ -4,7 +4,9 @@ using Minio;
 using Nest;
 using WebAPI.Model;
 using WebAPI.Redis;
-namespace APIDemo.Controllers
+using WebAPI.Service;
+
+namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -20,12 +22,14 @@ namespace APIDemo.Controllers
 
         //POSGRESQL
         private readonly DataContext _dbContext;
+        private readonly ProductService _productService;
         //REDIS
         private readonly IRedisCacheService _cacheService;
         public ProductController(
             IElasticClient elasticClient,
             ILogger<ProductController> logger,
             DataContext dbContext,
+            ProductService productService,
             IRedisCacheService cacheService,
             //MinioService minioService,
             MinioClient minioClient,
@@ -33,6 +37,7 @@ namespace APIDemo.Controllers
         IConfiguration configuration)
         {
             _dbContext = dbContext;
+            _productService = productService;
             _cacheService = cacheService;
             _logger = logger;
             _elasticClient = elasticClient;
@@ -56,6 +61,25 @@ namespace APIDemo.Controllers
             _cacheService.SetData<IEnumerable<Product>>("product", cacheData, expirationTime);
             return Ok(cacheData);
         }
+
+
+
+        [HttpGet("products/paged")]
+        public async Task<IActionResult> GetPagedProducts(int page = 1, int pageSize = 8)
+        {
+            var products = _productService.GetPageds(page, pageSize);
+            var result = new PagedResult<Product>
+            {
+                Items = products,
+                TotalItems = _productService.Count(),
+                CurrentPage = page,
+                PageSize = pageSize
+            };
+            return Ok(result);
+        }
+
+
+        /// //////////////////////////////////
 
         //Tìm theo ID
         [HttpGet("GetProductByID/{id}")]
@@ -157,9 +181,6 @@ namespace APIDemo.Controllers
             else
             {
                 string imageUrl = null;
-
-
-
                 if (model.Image != null && model.Image.Length > 0)
                 {
                     var fileName = $"{Guid.NewGuid().ToString()}{Path.GetExtension(model.Image.FileName)}";
@@ -169,14 +190,19 @@ namespace APIDemo.Controllers
 
                     imageUrl = $"{"http://localhost:9000"}/{_bucketName}/{fileName}";
                 }
+
                 if (!String.IsNullOrEmpty(model.Name))
                     sp_update.Name = model.Name;
-                if (!String.IsNullOrEmpty(model.Price.ToString()))
+
+                if (model.Price != null)
                     sp_update.Price = model.Price;
+
                 if (!String.IsNullOrEmpty(model.Status))
                     sp_update.Status = model.Status;
+
                 if (!String.IsNullOrEmpty(imageUrl))
                     sp_update.Image = imageUrl;
+
                 if (!String.IsNullOrEmpty(model.Description))
                     sp_update.Description = model.Description;
 
@@ -216,12 +242,35 @@ namespace APIDemo.Controllers
             // return NoContent();
         }
 
+        [HttpGet("GetTypeProduct/{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            // Get list of products for the specified type
+
+            var product = _dbContext.Products.AsQueryable()
+              .Join(_dbContext.TypeCars.AsQueryable(), p => p.TypeCarId, t => t.Id, (p, t) => new { Product = p, TypeCar = t })
+            //.FirstOrDefault(pt => pt.Product.Id == id);
+            .Where(pt => pt.TypeCar.Id == id)
+            .Select(pt => new
+            {
+                Id = pt.Product.Id,
+                Name = pt.Product.Name,
+                Image = pt.Product.Image,
+                Price = pt.Product.Price,
+                Type = pt.TypeCar.NameType
+            });
+
+            //return Ok(product);
+            return Ok(product.ToList());
+        }
+
 
     }
+
     public class ProductCreateModel
     {
-        public string Name { get; set; }
-        public decimal Price { get; set; }
+        public string? Name { get; set; }
+        public decimal? Price { get; set; }
         public string? Status { get; set; }
         public IFormFile Image { get; set; }
         public string? Description { get; set; }
@@ -230,5 +279,16 @@ namespace APIDemo.Controllers
         public int BrandId { get; set; }
         public int TypeCarId { get; set; }
     }
+
+    //public class PagedResult<T>
+    //{
+    //    public IEnumerable<T> Items { get; set; }
+    //    public int TotalItems { get; set; }
+    //    public int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize);
+    //    public int CurrentPage { get; set; }
+    //    public int PageSize { get; set; }
+    //}
+
+
 }
 

@@ -47,12 +47,12 @@ namespace WebAPI.Controllers
         [HttpGet("GetCartByID/{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-            Cart filteredData;
+
             var cacheData = _cacheService.GetData<IEnumerable<Cart>>("cart");
             if (cacheData != null && cacheData.Count() > 0)
             {
-                filteredData = cacheData.FirstOrDefault(x => x.Id == id);
-                return Ok(filteredData);
+                var cache = cacheData.FirstOrDefault(x => x.UserId == id);
+                return Ok(cache);
 
             }
             //else
@@ -60,7 +60,7 @@ namespace WebAPI.Controllers
             //    return NotFound("Không tìm thấy sản phẩm trong giỏ");
             //}
 
-            filteredData = await _dbContext.Carts.FirstOrDefaultAsync(x => x.Id == id);
+            var filteredData = await _dbContext.Carts.Where(x => x.UserId == id).ToListAsync();
             if (filteredData != null)
             {
                 return Ok(filteredData);
@@ -69,7 +69,7 @@ namespace WebAPI.Controllers
             {
                 return NotFound("Không tìm thấy sản phẩm sản phẩm trong giỏ");
             }
-            return default;
+
         }
         //Thêm
         [HttpPost("CreateCart")]
@@ -136,7 +136,10 @@ namespace WebAPI.Controllers
 
                 if (!String.IsNullOrEmpty(cart.Quantity.ToString()))
                     sp_update.Quantity = cart.Quantity;
-
+                if (!String.IsNullOrEmpty(cart.Name))
+                    sp_update.Name = cart.Name;
+                if (!String.IsNullOrEmpty(cart.Image))
+                    sp_update.Image = cart.Image;
                 _dbContext.Carts.Update(sp_update);
                 await _dbContext.SaveChangesAsync();
                 _cacheService.RemoveData("cart");

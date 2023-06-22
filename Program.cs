@@ -7,16 +7,17 @@ using System.Text;
 using WebAPI.Logstash;
 using WebAPI.Model;
 using WebAPI.Redis;
+using WebAPI.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 Microsoft.Extensions.Configuration.ConfigurationManager configuration = builder.Configuration;
 
 //1.tao postgres
-builder.Services.AddDbContext<DataContext>(o =>
-o.UseNpgsql(builder.Configuration.GetConnectionString("Postgres_Db")));
+builder.Services.AddDbContext<DataContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Postgres_Db")));
 // Add services to the container.
-
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<OrderService>();
 
 //MINIO
 builder.Services.AddMinio(options =>
@@ -28,11 +29,7 @@ builder.Services.AddMinio(options =>
         client.WithEndpoint(options.Endpoint, port);
     });
 });
-///*builder.Services.AddSingleton(new MinioClient(
-//       builder.Configuration.GetValue<string>("Minio:Endpoint"),
-//       builder.Configuration.GetValue<string>("Minio:AccessKey"),
-//        builder.Configuration.GetValue<string>("Minio:SecretKey"),
-//         builder.Configuration.GetValue<string>("Minio:BucketName")));*/
+
 
 
 //redis
@@ -40,7 +37,6 @@ builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 
 ////kafka
 //builder.Services.AddSingleton(new ProducerBuilder<Null, string>(new ProducerConfig { BootstrapServers = "localhost:9092" }));
-
 
 //// Đăng ký ProductConsumer
 //builder.Services.AddSingleton<CartConsumer>();

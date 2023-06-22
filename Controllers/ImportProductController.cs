@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Model;
 using WebAPI.Redis;
@@ -20,7 +18,7 @@ namespace WebAPI.Controllers
         }
 
         //Tìm ALL
-      
+
         [HttpGet("GetImportProductAll")]
         public async Task<IActionResult> GetAll()
         {
@@ -37,7 +35,7 @@ namespace WebAPI.Controllers
         }
 
         //Tìm theo ID
-        
+
         [HttpGet("GetImportProductByID/{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
@@ -62,7 +60,7 @@ namespace WebAPI.Controllers
             return default;
         }
         //Thêm
-        [Authorize(Policy = "admin")]
+        //[Authorize(Policy = "admin")]
         [HttpPost("CreateImportProduct")]
         public async Task<IActionResult> Post(ImportProduct value)
         {
@@ -76,7 +74,7 @@ namespace WebAPI.Controllers
         }
 
         //Sửa theo Id ?
-        [Authorize(Policy = "admin")]
+        //[Authorize(Policy = "admin")]
         [HttpPut("UpdateImportProduct/{id}")]
         public async Task<IActionResult> Update(int id, ImportProduct ImportProduct)
         {
@@ -89,7 +87,7 @@ namespace WebAPI.Controllers
             }
             else
             {
-                
+
                 if (!String.IsNullOrEmpty(ImportProduct.ProductId.ToString()))
                     sp_update.ProductId = ImportProduct.ProductId;
 
@@ -98,7 +96,7 @@ namespace WebAPI.Controllers
 
                 if (!String.IsNullOrEmpty(ImportProduct.OrderDate.ToString()))
                     sp_update.OrderDate = ImportProduct.OrderDate;
-                
+
 
                 _dbContext.ImportProducts.Update(sp_update);
 
@@ -109,7 +107,7 @@ namespace WebAPI.Controllers
             return Ok("Update Success");
         }
         //Xóa
-        [Authorize(Policy = "admin")]
+        //[Authorize(Policy = "admin")]
         [HttpDelete("DeleteImportProduct/{id}")]
         public async Task<IActionResult> Delete(int id)
         {

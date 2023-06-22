@@ -10,9 +10,9 @@ namespace WebAPI.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
         public string? Status { get; set; }
         public string? Image { get; set; }
 
@@ -21,10 +21,10 @@ namespace WebAPI.Model
 
         public int Quantity { get; set; }
         public int BrandId { get; set; }
-        //public virtual Brand Brand { get; set; }
+
 
         public int TypeCarId { get; set; }
-        // public virtual TypeCar TypeCar { get; set; }
+
 
         public virtual ICollection<ImportProduct> ImportProducts { get; } = new List<ImportProduct>();
 

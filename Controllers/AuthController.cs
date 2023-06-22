@@ -7,7 +7,7 @@ using System.Text;
 using WebAPI.Model;
 using WebAPI.Model.Auth;
 
-namespace APIDemo.Controllers
+namespace WebAPI.Controllers
 {
     [Route("api")]
     [ApiController]
@@ -45,8 +45,7 @@ namespace APIDemo.Controllers
         [HttpPost("login")]
         public IActionResult Validate(LoginModel model)
         {
-            // var user = _dbContext.Users.SingleOrDefault(
-            //  p =>p.UserName == model.Username && model.Password ==p.Password);
+
             var existingUser = _dbContext.Users.SingleOrDefault(
                 p => p.UserName == model.Username);
             if (!BCrypt.Net.BCrypt.Verify(model.Password, existingUser.Password))
@@ -73,7 +72,7 @@ namespace APIDemo.Controllers
             new Claim(ClaimTypes.Name, existingUser.UserName),
             new Claim(ClaimTypes.Role, existingUser.IsAdmin ? "admin" : "user"),
             new Claim(ClaimTypes.Email,existingUser.Email),
-//           // new Claim("FullName", existingUser.FullName),
+
 
 
             //roles
@@ -86,7 +85,7 @@ namespace APIDemo.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
-            //////////////
+
             //cấp token
             return Ok(new Response
             {
@@ -96,7 +95,8 @@ namespace APIDemo.Controllers
                 Data = new
                 {
                     id = existingUser.Id,
-                    Name = existingUser.UserName,
+                    name = existingUser.UserName,
+                    role = existingUser.IsAdmin ? "admin" : "user",
                     token = tokenString
                 }
 

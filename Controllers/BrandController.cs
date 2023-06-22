@@ -4,10 +4,10 @@ using Nest;
 using WebAPI.Model;
 using WebAPI.Redis;
 
-namespace APIDemo.Controllers
+namespace WebAPI.Controllers
 {
 
-    /////////////////////////////////Redis
+
     [Route("api/[controller]")]
     [ApiController]
     public class BrandController : ControllerBase

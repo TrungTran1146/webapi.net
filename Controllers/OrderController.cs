@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Model;
 using WebAPI.Redis;
+using WebAPI.Service;
 
 namespace WebAPI.Controllers
 {
@@ -12,10 +12,13 @@ namespace WebAPI.Controllers
     {
 
         private readonly DataContext _dbContext;
+        private readonly OrderService _orDerService;
+
         private readonly IRedisCacheService _cacheService;
-        public OrderController(DataContext dbContext, IRedisCacheService cacheService)
+        public OrderController(DataContext dbContext, OrderService orDerService, IRedisCacheService cacheService)
         {
             _dbContext = dbContext;
+            _orDerService = orDerService;
             _cacheService = cacheService;
         }
 
@@ -35,20 +38,39 @@ namespace WebAPI.Controllers
             return Ok(cacheData);
         }
 
+        /// ////////
+
+
+        [HttpGet("orders/paged")]
+        public async Task<IActionResult> GetPagedProducts(int page = 1, int pageSize = 8)
+        {
+            var orDers = _orDerService.GetPageds(page, pageSize);
+
+            var result = new PagedResult<Order>
+            {
+                Items = orDers,
+                TotalItems = _orDerService.Count(),
+                CurrentPage = page,
+                PageSize = pageSize
+            };
+            return Ok(result);
+        }
+
+
         //Tìm theo ID
         [HttpGet("GetOrderByID/{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-            Order filteredData;
+            //Order filteredData;
             var cacheData = _cacheService.GetData<IEnumerable<Order>>("Order");
             if (cacheData != null && cacheData.Count() > 0)
             {
-                filteredData = cacheData.FirstOrDefault(x => x.Id == id);
-                return Ok(filteredData);
+                var cache = cacheData.FirstOrDefault(x => x.Id == id);
+                return Ok(cache);
 
             }
 
-            filteredData = await _dbContext.Orders.FirstOrDefaultAsync(x => x.Id == id);
+            var filteredData = await _dbContext.Orders.Where(x => x.UserId == id).ToListAsync();
             if (filteredData != null)
             {
                 return Ok(filteredData);
@@ -57,7 +79,7 @@ namespace WebAPI.Controllers
             {
                 return NotFound("Không tìm thấy đơn hàng");
             }
-            return default;
+
         }
         //Thêm
         [HttpPost("CreateOrder")]
@@ -65,8 +87,7 @@ namespace WebAPI.Controllers
         {
             var obj = await _dbContext.Orders.AddAsync(value);
 
-            //   var expirationTime = DateTimeOffset.Now.AddMinutes(5);
-            //  _cacheService.SetData<Order>("Order",obj.Entity,expirationTime);
+
             _cacheService.RemoveData("Order");
             await _dbContext.SaveChangesAsync();
             return Ok(obj.Entity);
@@ -85,22 +106,34 @@ namespace WebAPI.Controllers
             }
             else
             {
-                if (!String.IsNullOrEmpty(Order.UserId.ToString()))
-                    sp_update.UserId = Order.UserId;
+                int userId = (int)(Order.UserId ?? sp_update.UserId);
+                sp_update.UserId = userId;
+
                 if (!String.IsNullOrEmpty(Order.Name))
                     sp_update.Name = Order.Name;
-                if (!String.IsNullOrEmpty(Order.Phone.ToString()))
-                    sp_update.Phone = Order.Phone;
+
+                int phone = (int)(Order.Phone ?? sp_update.Phone);
+                sp_update.Phone = phone;
+
                 if (!String.IsNullOrEmpty(Order.Status))
                     sp_update.Status = Order.Status;
+
                 if (!String.IsNullOrEmpty(Order.Address))
                     sp_update.Address = Order.Address;
-                if (!String.IsNullOrEmpty(Order.Date.ToString()))
+
+                if (!String.IsNullOrEmpty(Order.Date))
                     sp_update.Date = Order.Date;
 
-                if (!String.IsNullOrEmpty(Order.TotalOder.ToString()))
-                    sp_update.TotalOder = Order.TotalOder;
-               
+                //if (!String.IsNullOrEmpty(Order.Quantity.ToString()))
+                //    sp_update.Quantity = Order.Quantity;
+                int quantity = (int)(Order.Quantity ?? sp_update.Quantity);
+                sp_update.Quantity = quantity;
+
+                if (!String.IsNullOrEmpty(Order.NameUser))
+                    sp_update.NameUser = Order.NameUser;
+
+                if (Order.TotalOrder != null)
+                    sp_update.TotalOrder = Order.TotalOrder;
 
                 _dbContext.Orders.Update(sp_update);
 
@@ -108,8 +141,9 @@ namespace WebAPI.Controllers
                 _cacheService.RemoveData("Order");
             }
 
-            return Ok("Update Success");
+            return Ok(sp_update);
         }
+
         //Xóa
         [HttpDelete("DeleteOrder/{id}")]
         public async Task<IActionResult> Delete(int id)
