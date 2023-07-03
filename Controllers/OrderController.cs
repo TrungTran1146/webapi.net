@@ -15,6 +15,9 @@ namespace WebAPI.Controllers
         private readonly OrderService _orDerService;
 
         private readonly IRedisCacheService _cacheService;
+
+        public List<OrderItem> Items { get; private set; }
+
         public OrderController(DataContext dbContext, OrderService orDerService, IRedisCacheService cacheService)
         {
             _dbContext = dbContext;
@@ -86,12 +89,19 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Post(Order value)
         {
             var obj = await _dbContext.Orders.AddAsync(value);
-
+            Items = value.Items.Select(x => new OrderItem
+            {
+                OrderId = x.Id,
+                ProductId = x.ProductId,
+                Quantity = x.Quantity
+            }).ToList();
 
             _cacheService.RemoveData("Order");
             await _dbContext.SaveChangesAsync();
             return Ok(obj.Entity);
         }
+
+
 
         //Sửa theo Id ?
         [HttpPut("UpdateOrder/{id}")]
@@ -162,5 +172,7 @@ namespace WebAPI.Controllers
             return Ok("Delete Success");
             // return NoContent();
         }
+
+
     }
 }

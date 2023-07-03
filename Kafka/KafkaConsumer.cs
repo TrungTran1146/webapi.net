@@ -1,101 +1,93 @@
 ﻿using Confluent.Kafka;
 using Newtonsoft.Json;
-using WebAPI.Model;
-using WebAPI.Redis;
-
 namespace WebAPI.Kafka
 {
     public class KafkaConsumer
     {
-        private readonly IConsumer<Ignore, string> _consumer;
-        private readonly IServiceProvider _serviceProvider;
-
-        public KafkaConsumer(string bootstrapServers, string groupId, IServiceProvider serviceProvider)
+        public int id { get; set; }
+        public ConsumerConfig config { get; set; }
+        public string topic { get; set; }
+        public void Listen()
         {
-            var config = new ConsumerConfig
+            var consumeTask = Task.Run(() =>
             {
-                BootstrapServers = bootstrapServers,
-                GroupId = groupId,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-                EnableAutoCommit = true
-            };
-
-            _consumer = new ConsumerBuilder<Ignore, string>(config).Build();
-            _serviceProvider = serviceProvider;
-        }
-
-        public void Subscribe(string topic)
-        {
-            _consumer.Subscribe(topic);
-        }
-
-        public async Task ConsumeAsync(CancellationToken cancellationToken = default)
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                try
+                //đối tượng `ConsumerBuilder` để xây dựng một đối tượng consumer mới,
+                //sử dụng `config` đã được thiết lập trước đó và cài đặt chế độ không
+                //phản hồi để theo dõi các yêu cầu hủy bỏ từ người dùng.
+                using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
                 {
-                    var consumeResult = _consumer.Consume(cancellationToken);
-                    var message = consumeResult.Message.Value;
-                    Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {message}");
-
-                    // Deserialize the message to cart object
-                    var cart = JsonConvert.DeserializeObject<Cart>(message);
-
-                    // Handle the message
-                    using (var scope = _serviceProvider.CreateScope())
+                    CancellationTokenSource cts = new CancellationTokenSource();
+                    Console.CancelKeyPress += (_, e) =>
                     {
-                        var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-                        var redisCache = scope.ServiceProvider.GetRequiredService<IRedisCacheService>();
+                        e.Cancel = true;
+                        cts.Cancel();
+                    };
 
-                        if (cart.Id == 0)
+                    //phương thức `Subscribe()` để đăng ký chủ đề mà bạn muốn nghe thông
+                    //điệp và tạo một vòng lặp lắng nghe các thông điệp.
+                    consumer.Subscribe(topic);
+                    try
+                    {
+                        while (true)
                         {
-                            // Add new cart to database
-                            dbContext.Carts.Add(cart);
-                            await dbContext.SaveChangesAsync();
-
-                            // Add new cart to Redis cache
-                            var cacheKey = $"cart:{cart.Id}";
-                            var cacheValue = JsonConvert.SerializeObject(cart);
-                            var expirationTime = DateTimeOffset.Now.AddMinutes(5);
-                            redisCache.SetData(cacheKey, cacheValue, expirationTime);
-                        }
-                        else
-                        {
-                            // Update existing cart in database
-                            var existingcart = await dbContext.Carts.FindAsync(cart.Id);
-
-                            if (existingcart == null)
+                            try
                             {
-                                Console.WriteLine($"cart with id {cart.Id} not found");
+                                //phương thức `Consume()` để nhận thông điệp từ chủ đề Kafka
+                                //và lưu trữ nó trong một biến tạm thời `consumeResult`
+                                var consumeResult = consumer.Consume(cts.Token);
+                                var message = consumeResult.Message.Value;
+                                Console.WriteLine("Consumer");
+                                EventHandler(message);
+
+                                //bạn lưu trữ vị trí của thông điệp bằng cách gọi
+                                //phương thức `StoreOffset()` để đảm bảo rằng consumer sẽ không nhận thông điệp cũ.
+                                consumer.StoreOffset(consumeResult);
                             }
-                            else
+                            catch (ConsumeException ex)
                             {
-                                //existingcart.Status = cart.Status;
-                                existingcart.Quantity = cart.Quantity;
-                                //existingcart.Price = cart.Price;
 
-                                await dbContext.SaveChangesAsync();
-
-                                // Update existing cart in Redis cache
-                                var cacheKey = $"cart:{cart.Id}";
-                                var cacheValue = JsonConvert.SerializeObject(existingcart);
-                                var expirationTime = DateTimeOffset.Now.AddMinutes(5);
-                                redisCache.SetData(cacheKey, cacheValue, expirationTime);
                             }
                         }
                     }
+                    catch (OperationCanceledException op)
+                    {
+                        consumer.Close();
+                        cts.Cancel();
+                    }
                 }
-                catch (ConsumeException e)
-                {
-                    Console.WriteLine($"Error while consuming message: {e.Error.Reason}");
-                }
-            }
+            });
         }
 
-        public void Dispose()
+        public static void EventHandler(string message)
         {
-            _consumer.Dispose();
+            if (!string.IsNullOrEmpty(message))
+            {
+                try
+                {
+                    var kafkaModel = JsonConvert.DeserializeObject<KafkaModel>(message);
+                    if (kafkaModel != null)
+                    {
+                        var kafkaWorkflow = new KafkaWorkflow();
+                        if (kafkaModel.Topic == TopicList.Create)
+                        {
+                            kafkaWorkflow.CreateProduct(kafkaModel.Data);
+                        }
+
+                        if (kafkaModel.Topic == TopicList.Update)
+                        {
+
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+
+            }
+
         }
+
     }
 }

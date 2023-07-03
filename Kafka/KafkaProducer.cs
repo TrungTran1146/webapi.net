@@ -4,27 +4,21 @@ namespace WebAPI.Kafka
 {
     public class KafkaProducer
     {
-        private readonly IProducer<Null, string> _producer;
-
-        public KafkaProducer(string bootstrapServers)
+        public static IProducer<Null, string>? producer { get; set; }
+        public static void SetUpProducer()
         {
-            var config = new ProducerConfig
+            var config = new ProducerConfig()
             {
-                BootstrapServers = bootstrapServers
+                BootstrapServers = "localhost:9092",
+                LingerMs = 50,
+                MessageSendMaxRetries = 10,
+                EnableIdempotence = true,
+                RetryBackoffMs = 500,
+                MessageMaxBytes = 20000000
             };
 
-            _producer = new ProducerBuilder<Null, string>(config).Build();
-        }
-
-        public async Task ProduceAsync(string topic, string message)
-        {
-            var deliveryResult = await _producer.ProduceAsync(topic, new Message<Null, string> { Value = message });
-            Console.WriteLine($"Delivered message to {deliveryResult.TopicPartitionOffset}");
-        }
-
-        public void Dispose()
-        {
-            _producer.Dispose();
+            var _producer = new ProducerBuilder<Null, string>(config);
+            producer = _producer.Build();
         }
     }
 }

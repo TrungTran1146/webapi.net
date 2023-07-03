@@ -57,7 +57,7 @@ namespace WebAPI.Controllers
             {
                 return NotFound("Không tìm thấy sản phẩm");
             }
-            return default;
+
         }
         //Thêm
         //[Authorize(Policy = "admin")]

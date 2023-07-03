@@ -138,6 +138,30 @@ namespace WebAPI.Migrations
                     b.ToTable("Order");
                 });
 
+            modelBuilder.Entity("WebAPI.Model.OrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderItem");
+                });
+
             modelBuilder.Entity("WebAPI.Model.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -248,6 +272,15 @@ namespace WebAPI.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WebAPI.Model.OrderItem", b =>
+                {
+                    b.HasOne("WebAPI.Model.Order", null)
+                        .WithMany("Items")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("WebAPI.Model.Product", b =>
                 {
                     b.HasOne("WebAPI.Model.Brand", null)
@@ -266,6 +299,11 @@ namespace WebAPI.Migrations
             modelBuilder.Entity("WebAPI.Model.Brand", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("WebAPI.Model.Order", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("WebAPI.Model.Product", b =>

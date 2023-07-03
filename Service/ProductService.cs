@@ -4,11 +4,10 @@ namespace WebAPI.Service
 {
     public class ProductService
     {
-        private readonly DataContext _dbContext;
-
-        public ProductService(DataContext dbContext)
+        public readonly DataContext _dbContext;
+        public ProductService(DataContext context)
         {
-            _dbContext = dbContext;
+            _dbContext = context;
         }
         public IEnumerable<Product> GetAllProducts()
         {
@@ -23,6 +22,20 @@ namespace WebAPI.Service
         public int Count()
         {
             return _dbContext.Products.Count();
+        }
+
+        public async Task<bool> Create(Product product)
+        {
+            try
+            {
+                var result = await _dbContext.Products.AddAsync(product);
+            }
+            catch (Exception ex)
+            {
+                var exx = ex;
+            }
+
+            return _dbContext.SaveChanges() == 1 ? true : false;
         }
     }
 }

@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Minio;
 using Nest;
+using Newtonsoft.Json;
+using WebAPI.Kafka;
 using WebAPI.Model;
 using WebAPI.Redis;
 using WebAPI.Service;
@@ -33,8 +35,7 @@ namespace WebAPI.Controllers
             IRedisCacheService cacheService,
             //MinioService minioService,
             MinioClient minioClient,
-
-        IConfiguration configuration)
+            IConfiguration configuration)
         {
             _dbContext = dbContext;
             _productService = productService;
@@ -62,8 +63,6 @@ namespace WebAPI.Controllers
             return Ok(cacheData);
         }
 
-
-
         [HttpGet("products/paged")]
         public async Task<IActionResult> GetPagedProducts(int page = 1, int pageSize = 8)
         {
@@ -77,7 +76,6 @@ namespace WebAPI.Controllers
             };
             return Ok(result);
         }
-
 
         /// //////////////////////////////////
 
@@ -103,8 +101,9 @@ namespace WebAPI.Controllers
             {
                 return NotFound("Không tìm thấy sản phẩm");
             }
-            return default;
+
         }
+
         //Thêm
         //[Authorize(Policy = "admin")]
         //[HttpPost("CreateProduct")]
@@ -139,7 +138,8 @@ namespace WebAPI.Controllers
 
                     imageUrl = $"{"http://localhost:9000"}/{_bucketName}/{fileName}";
                 }
-                var product = new Product
+
+                var product = new Product()
                 {
                     Name = model.Name,
                     Price = model.Price,
@@ -149,12 +149,17 @@ namespace WebAPI.Controllers
                     Quantity = model.Quantity,
                     BrandId = model.BrandId,
                     TypeCarId = model.TypeCarId,
-
                 };
-
-                _dbContext.Products.Add(product);
-                _cacheService.RemoveData("product");
-                await _dbContext.SaveChangesAsync();
+                var request = new KafkaModel()
+                {
+                    Topic = "create1",
+                    Data = JsonConvert.SerializeObject(product)
+                };
+                //Test Kafka
+                await Kafka.Kafka.KafkaProducerAsync("create1", request, new CancellationToken());
+                /*                _dbContext.Products.Add(product);
+                                _cacheService.RemoveData("product");*/
+                /*                await _dbContext.SaveChangesAsync();*/
 
                 return Ok(product);
             }
@@ -279,16 +284,5 @@ namespace WebAPI.Controllers
         public int BrandId { get; set; }
         public int TypeCarId { get; set; }
     }
-
-    //public class PagedResult<T>
-    //{
-    //    public IEnumerable<T> Items { get; set; }
-    //    public int TotalItems { get; set; }
-    //    public int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize);
-    //    public int CurrentPage { get; set; }
-    //    public int PageSize { get; set; }
-    //}
-
-
 }
 

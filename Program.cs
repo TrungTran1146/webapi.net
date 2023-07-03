@@ -3,21 +3,74 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Minio.AspNetCore;
+using Nest;
+using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Compact;
+using Serilog.Sinks.Http.BatchFormatters;
 using System.Text;
-using WebAPI.Logstash;
+using WebAPI.Kafka;
 using WebAPI.Model;
 using WebAPI.Redis;
 using WebAPI.Service;
 
 var builder = WebApplication.CreateBuilder(args);
-
 Microsoft.Extensions.Configuration.ConfigurationManager configuration = builder.Configuration;
+
+
+
+
+
 
 //1.tao postgres
 builder.Services.AddDbContext<DataContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Postgres_Db")));
-// Add services to the container.
+
+
+// phan trang
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<OrderService>();
+
+
+//logstash
+//builder.Services.AddElasticsearch(builder.Configuration); // Đảm bảo đã cấu hình dịch vụ Elasticsearch
+
+builder.Services.AddTransient<IElasticClient>(provider =>
+{
+    var settings = new ConnectionSettings(new Uri("http://localhost:9200"));
+    // Cấu hình kết nối Elasticsearch ở đây
+    var client = new ElasticClient(settings);
+    return client;
+});
+
+///////
+Log.Logger = new LoggerConfiguration()
+  .WriteTo.Http(
+    requestUri: "http://localhost:5044",
+    batchFormatter: new ArrayBatchFormatter(),
+    textFormatter: new RenderedCompactJsonFormatter())
+   .MinimumLevel.Debug()
+   .MinimumLevel.Information()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .Enrich.FromLogContext()
+.WriteTo.Console()
+  .CreateLogger();
+//builder.Services.AddSingleton<DiagnosticContext>();
+///////
+//Log.Logger = new LoggerConfiguration()
+//    .MinimumLevel.Debug()
+//    .WriteTo.Console()
+//    .WriteTo.Http("http://localhost:5044")
+//    .CreateLogger();
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.ClearProviders();
+    loggingBuilder.AddSerilog(dispose: true);
+});
+
+// Đăng ký các dịch vụ khác
+//builder.Services.AddScoped<IMyService, MyService>();
+//    }
+
 
 //MINIO
 builder.Services.AddMinio(options =>
@@ -35,11 +88,7 @@ builder.Services.AddMinio(options =>
 //redis
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 
-////kafka
-//builder.Services.AddSingleton(new ProducerBuilder<Null, string>(new ProducerConfig { BootstrapServers = "localhost:9092" }));
 
-//// Đăng ký ProductConsumer
-//builder.Services.AddSingleton<CartConsumer>();
 
 
 
@@ -50,6 +99,9 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
+
+
+
 // Adding Jwt Bearer
 .AddJwtBearer(options =>
 {
@@ -70,6 +122,8 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
+
+//phan quyen
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("admin", policy => policy.RequireRole("admin"));
@@ -84,10 +138,15 @@ builder.Services.AddAuthorization(options =>
        ));
 });
 
-///////////////////////////////////////////////////////////////////////////////////
+
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+
+
+
 // 5. Swagger authentication
 builder.Services.AddSwaggerGen(c =>
 {
@@ -123,13 +182,24 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddSwaggerGen();
 
 
+
+
 //Logstash
-builder.Services.AddElasticsearch(builder.Configuration);
+//builder.Services.AddElasticsearch(builder.Configuration);
+
+
+
+
+////////////////////////
 
 var app = builder.Build();
 
 
-
+//Kafka
+KafkaProducer.SetUpProducer();
+var kafkaService = new KafkaService();
+kafkaService.Start();
+//app.UseSerilogRequestLogging();
 
 
 // Configure the HTTP request pipeline.
@@ -138,6 +208,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+
+
+
 //7. Use CORS
 //app.UseCors("AllowAngularDevClient");
 app.UseCors(builder =>
@@ -146,6 +221,10 @@ app.UseCors(builder =>
             .AllowAnyMethod());
 
 app.UseHttpsRedirection();
+
+
+
+
 
 //xác thực
 app.UseAuthentication();

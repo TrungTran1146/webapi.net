@@ -22,6 +22,7 @@ namespace WebAPI.Model
 
         public int? Quantity { get; set; }
         public decimal? TotalOrder { get; set; }
+        public List<OrderItem> Items { get; set; } = new List<OrderItem>();
 
 
     }

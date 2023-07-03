@@ -13,7 +13,7 @@ namespace WebAPI.Controllers
         private readonly IRedisCacheService _cacheService;
 
         //private readonly KafkaProducer _kafkaProducer;
-        //private readonly KafkaConsumer _kafkaConsumer;
+
         public CartController(
             DataContext dbContext,
             IRedisCacheService cacheService
@@ -38,7 +38,6 @@ namespace WebAPI.Controllers
             }
             cacheData = await _dbContext.Carts.ToListAsync();
             var expirationTime = DateTimeOffset.Now.AddMinutes(5);
-
             _cacheService.SetData<IEnumerable<Cart>>("cart", cacheData, expirationTime);
             return Ok(cacheData);
         }
@@ -47,7 +46,6 @@ namespace WebAPI.Controllers
         [HttpGet("GetCartByID/{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-
             var cacheData = _cacheService.GetData<IEnumerable<Cart>>("cart");
             if (cacheData != null && cacheData.Count() > 0)
             {
@@ -55,10 +53,6 @@ namespace WebAPI.Controllers
                 return Ok(cache);
 
             }
-            //else
-            //{
-            //    return NotFound("Không tìm thấy sản phẩm trong giỏ");
-            //}
 
             var filteredData = await _dbContext.Carts.Where(x => x.UserId == id).ToListAsync();
             if (filteredData != null)
@@ -133,7 +127,6 @@ namespace WebAPI.Controllers
 
             else
             {
-
                 if (!String.IsNullOrEmpty(cart.Quantity.ToString()))
                     sp_update.Quantity = cart.Quantity;
                 if (!String.IsNullOrEmpty(cart.Name))
@@ -144,7 +137,6 @@ namespace WebAPI.Controllers
                 await _dbContext.SaveChangesAsync();
                 _cacheService.RemoveData("cart");
             }
-
             return Ok("Update Success");
         }
         //Xóa

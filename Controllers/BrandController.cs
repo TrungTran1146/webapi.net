@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nest;
+using Serilog;
 using WebAPI.Model;
 using WebAPI.Redis;
 
@@ -19,10 +20,10 @@ namespace WebAPI.Controllers
         private readonly DataContext _dbContext;
         private readonly IRedisCacheService _cacheService;
         public BrandController(
-              IElasticClient elasticClient,
+                IElasticClient elasticClient,
                 ILogger<BrandController> logger,
-            DataContext dbContext,
-            IRedisCacheService cacheService)
+                DataContext dbContext,
+                IRedisCacheService cacheService)
         {
             _dbContext = dbContext;
             _cacheService = cacheService;
@@ -36,25 +37,36 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAll()
         //(string keyword)
         {
-            //var result = await _elasticClient.SearchAsync<Brand>(
-            //           s => s.Query(
-            //               q => q.QueryString(
-            //                   d => d.Query('*' + keyword + '*')
-            //               )).Size(5000));
+            Log.Information("trung dep trai");
 
-            //_logger.LogInformation("BrandController Get - ", DateTime.UtcNow);
-            ////////////////////////
-            var cacheData = _cacheService.GetData<IEnumerable<Brand>>("brand");
-            if (cacheData != null && cacheData.Count() > 0)
+            try
             {
+                //Log.Information("Logged on {PlaceHolderName:MMMM dd, yyyy}", DateTimeOffset.UtcNow);
+
+                // Lấy danh sách tất cả sản phẩm từ CSDL
+                // ...
+                var cacheData = _cacheService.GetData<IEnumerable<Brand>>("brand");
+                if (cacheData != null && cacheData.Count() > 0)
+                {
+                    return Ok(cacheData);
+                }
+                cacheData = await _dbContext.Brands.ToListAsync();
+                var expirationTime = DateTimeOffset.Now.AddMinutes(5);
+
+                _cacheService.SetData<IEnumerable<Brand>>("brand", cacheData, expirationTime);
+                //Log.Debug("Total products: {ProductCount}", products.Count);
+                // Ghi log số lượng sản phẩm
+                // ...
+
+                //Log.InformatKion("TrungTran", cacheData);
+                //Log.Information("trungdep trai", cacheData);
                 return Ok(cacheData);
             }
-            cacheData = await _dbContext.Brands.ToListAsync();
-            var expirationTime = DateTimeOffset.Now.AddMinutes(5);
-
-            _cacheService.SetData<IEnumerable<Brand>>("brand", cacheData, expirationTime);
-            return Ok(cacheData);
-            //return Ok(result.Documents.ToList());
+            catch (Exception ex)
+            {
+                Log.Error(ex, "trung");
+                return StatusCode(500, "An error occurred");
+            }
         }
 
         //Tìm theo ID
@@ -62,25 +74,64 @@ namespace WebAPI.Controllers
         [HttpGet("GetBrandByID/{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-            Brand filteredData;
-            var cacheData = _cacheService.GetData<IEnumerable<Brand>>("brand");
-            if (cacheData != null && cacheData.Count() > 0)
-            {
-                filteredData = cacheData.FirstOrDefault(x => x.Id == id);
-                return Ok(filteredData);
+            Log.Information("Logged on {PlaceHolderName:MMMM dd, yyyy}", DateTimeOffset.UtcNow);
 
-            }
 
-            filteredData = await _dbContext.Brands.FirstOrDefaultAsync(x => x.Id == id);
-            if (filteredData != null)
+            try
             {
-                return Ok(filteredData);
+                // Lấy danh sách tất cả sản phẩm từ CSDL
+                // ...
+                Log.Information("Trung Api ID");
+
+                Brand filteredData;
+                var cacheData = _cacheService.GetData<IEnumerable<Brand>>("brand");
+                if (cacheData != null && cacheData.Count() > 0)
+                {
+                    filteredData = cacheData.FirstOrDefault(x => x.Id == id);
+                    return Ok(filteredData);
+
+                }
+
+                filteredData = await _dbContext.Brands.FirstOrDefaultAsync(x => x.Id == id);
+                if (filteredData != null)
+                {
+                    Log.Information("API request processed successfully");
+                    return Ok(filteredData);
+                }
+                else
+                {
+                    return NotFound("Không tìm thấy sản phẩm");
+                }
+                //Log.Debug("Total products: {ProductCount}", products.Count);
+                // Ghi log số lượng sản phẩm
+                // ...
             }
-            else
+            catch (Exception ex)
             {
-                return NotFound("Không tìm thấy sản phẩm");
+                Log.Error(ex, "An error occurred while processing the API request");
+                return StatusCode(500, "An error occurred");
             }
-            return default;
+            ////////
+            //_logger.LogInformation("Getting all brands");
+            //Brand filteredData;
+            //var cacheData = _cacheService.GetData<IEnumerable<Brand>>("brand");
+            //if (cacheData != null && cacheData.Count() > 0)
+            //{
+            //    filteredData = cacheData.FirstOrDefault(x => x.Id == id);
+            //    return Ok(filteredData);
+
+            //}
+
+            //filteredData = await _dbContext.Brands.FirstOrDefaultAsync(x => x.Id == id);
+            //if (filteredData != null)
+            //{
+            //    return Ok(filteredData);
+            //}
+            //else
+            //{
+            //    return NotFound("Không tìm thấy sản phẩm");
+            //}
+
         }
         //Thêm
         // [Authorize(Policy = "admin")]
@@ -91,14 +142,43 @@ namespace WebAPI.Controllers
 
             //_logger.LogInformation("BrandController Post - ", DateTime.UtcNow);
             ///////////////////////
-            var obj = await _dbContext.Brands.AddAsync(brand);
+            //var obj = await _dbContext.Brands.AddAsync(brand);
 
-            //   var expirationTime = DateTimeOffset.Now.AddMinutes(5);
-            //  _cacheService.SetData<Brand>("brand",obj.Entity,expirationTime);
-            _cacheService.RemoveData("brand");
-            await _dbContext.SaveChangesAsync();
+            ////   var expirationTime = DateTimeOffset.Now.AddMinutes(5);
+            ////  _cacheService.SetData<Brand>("brand",obj.Entity,expirationTime);
+            //_cacheService.RemoveData("brand");
+            //await _dbContext.SaveChangesAsync();
+            ////return Ok(obj.Entity);
             //return Ok(obj.Entity);
-            return Ok(obj.Entity);
+
+
+
+            try
+            {
+                // Lấy danh sách tất cả sản phẩm từ CSDL
+                // ...
+
+
+                var obj = await _dbContext.Brands.AddAsync(brand);
+
+                //var tam2 = JsonConvert.DeserializeObject();
+
+                //   var expirationTime = DateTimeOffset.Now.AddMinutes(5);
+                //  _cacheService.SetData<Brand>("brand",obj.Entity,expirationTime);
+                _cacheService.RemoveData("brand");
+                await _dbContext.SaveChangesAsync();
+                Log.Warning("{@Brand} at {time}", brand, DateTime.UtcNow.ToString());
+                //return Ok(obj.Entity);
+                return Ok(obj.Entity);
+                //Log.Debug("Total products: {ProductCount}", products.Count);
+                // Ghi log số lượng sản phẩm
+                // ...
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while processing the API request");
+                return StatusCode(500, "An error occurred");
+            }
         }
 
         //Sửa theo Id ?

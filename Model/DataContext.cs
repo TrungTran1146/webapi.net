@@ -1,22 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
-using System.Reflection.Emit;
-
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Model
 {
     public class DataContext : DbContext
-       // IdentityDbContext<IdentityUser>
+    // IdentityDbContext<IdentityUser>
     {
+        public DataContext() : base() { }
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>(entity =>
             {
-
-
                 entity.Property(e => e.Id)
 
                     .HasColumnType("serial")
@@ -25,6 +19,8 @@ namespace WebAPI.Model
             });
 
         }
+
+
 
         public DbSet<Brand> Brands { get; set; }
 
@@ -39,5 +35,5 @@ namespace WebAPI.Model
 
         public DbSet<User> Users { get; set; }
     }
-    
+
 }

@@ -40,6 +40,14 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "Autofac": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Autofac.Mvc5": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
             "BCrypt.Net-Next": {
               "target": "Package",
               "version": "[4.0.3, )"
@@ -104,6 +112,18 @@
               "target": "Package",
               "version": "[6.0.0, )"
             },
+            "Serilog.AspNetCore": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Serilog.Sinks.Elasticsearch": {
+              "target": "Package",
+              "version": "[6.1.0, )"
+            },
+            "Serilog.Sinks.Http": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
             "StackExchange.Redis": {
               "target": "Package",
               "version": "[2.6.48, )"
@@ -123,6 +143,10 @@
             "UploadFileToMinio": {
               "target": "Package",
               "version": "[1.0.0, )"
+            },
+            "log4net.ElasticSearch": {
+              "target": "Package",
+              "version": "[2.5.0, )"
             }
           },
           "imports": [

@@ -55,8 +55,8 @@ namespace WebAPI.Controllers
             {
                 return NotFound("Không tìm thấy loại xe");
             }
-            return default;
         }
+
         //Thêm
         //[Authorize(Policy = "admin")]
         [HttpPost("CreateTypeCar")]
@@ -93,7 +93,6 @@ namespace WebAPI.Controllers
                 await _dbContext.SaveChangesAsync();
                 _cacheService.RemoveData("TypeCar");
             }
-
             return Ok(sp_update);
         }
         //Xóa
